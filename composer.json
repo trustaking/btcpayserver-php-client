@@ -4,10 +4,10 @@
     "license": "MIT",
     "minimum-stability": "stable",
     "keywords": ["btcpayserver", "bitcoin"],
-    "homepage": "https://github.com/btcpayserver/btcpayserver-php-client",
+    "homepage": "https://github.com/trustaking/btcpayserver-php-client",
     "support": {
-        "issues": "https://github.com/btcpayserver/btcpayserver-php-client/issues",
-        "source": "https://github.com/btcpayserver/btcpayserver-php-client"
+        "issues": "https://github.com/trustaking/btcpayserver-php-client/issues",
+        "source": "https://github.com/trustaking/btcpayserver-php-client"
     },
     "authors": [
         {
