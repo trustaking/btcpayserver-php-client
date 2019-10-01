@@ -1,20 +1,20 @@
 <?php
 /**
- * Copyright (c) 2014-2017 BTCPayServer
+ * Copyright (c) 2014-2017 BitPay
  *
  * 004 - IPN logger
  *
  * Requirements:
- *   - Account on https://test.btcpayserver.com
+ *   - Account on https://test.bitpay.com
  *   - Baisic PHP Knowledge
  *   - Private and Public keys from 001.php
  *   - Token value obtained from 002.php
  *   - Invoice created & paid
  */
-require __DIR__.'/../../vendor/autoload.php';
+require __DIR__ . '/../../vendor/autoload.php';
 
 
-$myfile = fopen("/tmp/BTCPayServerIPN.log", "a");
+$myfile = fopen("/tmp/BitPayIPN.log", "a");
 
 $raw_post_data = file_get_contents('php://input');
 
@@ -29,9 +29,9 @@ if (false === $raw_post_data) {
 $ipn = json_decode($raw_post_data);
 
 if (true === empty($ipn)) {
-    fwrite($myfile, $date . " : Error. Could not decode the JSON payload from BTCPayServer.\n");
+    fwrite($myfile, $date . " : Error. Could not decode the JSON payload from BitPay.\n");
     fclose($myfile);
-    throw new \Exception('Could not decode the JSON payload from BTCPayServer.');
+    throw new \Exception('Could not decode the JSON payload from BitPay.');
 }
 
 if (true === empty($ipn->id)) {
@@ -40,22 +40,17 @@ if (true === empty($ipn->id)) {
     throw new \Exception('Invalid BTCPayServer payment notification message received - did not receive invoice ID.');
 }
 
-// Now fetch the invoice from BTCPayServer
+// Now fetch the invoice from BitPay
 // This is needed, since the IPN does not contain any authentication
-$storageEngine = new \BTCPayServer\Storage\EncryptedFilesystemStorage('YourTopSecretPassword');
-$privateKey    = $storageEngine->load('/tmp/btcpayserver.pri');
-$publicKey     = $storageEngine->load('/tmp/btcpayserver.pub');
-$client        = new \BTCPayServer\Client\Client();
-$adapter       = new \BTCPayServer\Client\Adapter\CurlAdapter();
-$client->setPrivateKey($privateKey);
-$client->setPublicKey($publicKey);
-$client->setUri('https://btcpay.server/');
+
+$client = new \BTCPayServer\Client\Client();
+$adapter = new \BTCPayServer\Client\Adapter\CurlAdapter();
+$client->setUri('https://my-btcpay-server.com');
 $client->setAdapter($adapter);
 
 $token = new \BTCPayServer\Token();
 $token->setToken('UpdateThisValue'); // UPDATE THIS VALUE
 $client->setToken($token);
-$token->setFacade('merchant');
 
 /**
  * This is where we will fetch the invoice object
@@ -66,9 +61,10 @@ $invoiceStatus = $invoice->getStatus();
 $invoiceExceptionStatus = $invoice->getExceptionStatus();
 $invoicePrice = $invoice->getPrice();
 
-fwrite($myfile, $date . " : IPN received for BTCPayServer invoice ".$invoiceId." . Status = " .$invoiceStatus." / exceptionStatus = " . $invoiceExceptionStatus." Price = ". $invoicePrice." Tax Included = ". $taxIncluded."\n");
-fwrite($myfile, "Raw IPN: ". $raw_post_data."\n");
+fwrite($myfile, $date . " : IPN received for BitPay invoice " . $invoiceId . " . Status = " . $invoiceStatus . " / exceptionStatus = " . $invoiceExceptionStatus . " Price = " . $invoicePrice . "\n");
+fwrite($myfile, "Raw IPN: " . $raw_post_data . "\n");
 
-//Respond with HTTP 200, so BTCPayServer knows the IPN has been received correctly
-//If BTCPayServer receives <> HTTP 200, then BTCPayServer will try to send the IPN again with increasing intervals for two more hours.
+//Respond with HTTP 200, so BitPay knows the IPN has been received correctly
+//If BitPay receives <> HTTP 200, then BitPay will try to send the IPN again with increasing intervals for two more hours.
 header("HTTP/1.1 200 OK");
+?>
