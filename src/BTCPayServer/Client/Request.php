@@ -134,7 +134,7 @@ class Request implements RequestInterface
      *
      * @inheritdoc
      */
-    public function setPort(int $port)
+    public function setPort($port)
     {
         $this->port = $port;
     }
